@@ -11,10 +11,20 @@ public class player : MonoBehaviour {
 	public  Transform   character;          //Personagem jogavel
 	private Animator    anime;              //Animacao do personagem
 
+	// Vidas
+	public int vidaMax;
+	public int vidas;
+
+	// Ataque
+	public  GameObject  dano;            // Obj hit point
+	private Vector2     danoposition;    // Posição do ataque
+
 	// Use this for initialization
 	void Start () 
 	{
-		//Recupera a animacao do personagem
+		// Inicializa vida
+		vidas = vidaMax;
+		// Recupera a animacao do personagem
 		anime = character.GetComponent <Animator> ();
 	}
 	
@@ -23,6 +33,9 @@ public class player : MonoBehaviour {
 	{		
 		// Controla movimento
 		Move ();
+
+		// Controla o Ataque
+		Ataca ();
 	}
 	
 	// Controla movimento 
@@ -66,9 +79,40 @@ public class player : MonoBehaviour {
 			transform.Translate (Vector2.right * -velocity * Time.deltaTime);
 		}
 	}
+
+	void Ataca () {
+
+		// Determina a posicão do ataque
+		danoposition = transform.position;
+
+		if (lado == 1) {
+			danoposition.y += 0.15f;
+		} else if (lado == 2) {
+			danoposition.y -= 0.15f;
+		} else if (lado == 3) {
+			danoposition.x -= 0.15f;
+		} else if (lado == 4) {
+			danoposition.x += 0.15f;
+		}
+			
+		if (Input.GetKeyDown(KeyCode.Space)) {
+			anime.SetTrigger ("ataque");
+			Instantiate(dano, danoposition, transform.rotation);
+		}
+	}
 	
 	void OnCollisionEnter2D (Collision2D colisor) {
 	
+		if (colisor.gameObject.tag == "Enimie") {
+			// Perda de vida
+			vidas--;
+		}
+
+		if (vidas == 0){
+			// Destroi personagem
+			Destroy(gameObject);
+
+		}
 	}
 	
 }

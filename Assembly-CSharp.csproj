@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{3118893B-4CE9-2212-A672-2719484FCE30}</ProjectGuid>
+    <ProjectGuid>{71F0E649-B5FC-92FA-EB1F-5F8AA9A01B79}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -45,7 +45,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\ataque1.cs" />
      <Compile Include="Assets\Scripts\camera.cs" />
+     <Compile Include="Assets\Scripts\enimie.cs" />
      <Compile Include="Assets\Scripts\id_player.cs" />
      <Compile Include="Assets\Scripts\player.cs" />
  <Reference Include="UnityEngine.UI">
