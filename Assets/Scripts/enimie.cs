@@ -5,11 +5,14 @@ public class enimie : MonoBehaviour
 {
 
     // Movimento
-    public float velocity;              // Velocidade do inimigo
+    public float velocity;              // Velocidade do padrão inimigo
+	public float realVelocity;          // Velocidade do real inimigo
     public bool forRigth = true;        // Indica se direção é a direita
     public float runDelay;              // Tempo que caminha prara cada direção
     private float runningTime;          // Tempo de caminhada
     private bool running;               // Indica se está andando
+	private bool seePlayer;             // Indica viu o jogador
+	private Vector2	rangeVision;		// Alcance da visao do mosntro
 	private int lado;					// Indica a direção a ser percorrida
 
     //Animação
@@ -22,20 +25,43 @@ public class enimie : MonoBehaviour
     void Start()
     {
         // Carrega a animação
-//        anime = character.GetComponent<Animator>();
+        anime = character.GetComponent<Animator>();
         runningTime = 0;
         running = false;
 		life = 10;
+		realVelocity = velocity;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-		if (!running) {
+		if (!running && !seePlayer) {
 			runDelay = Random.Range (1, 6);
 			lado = Random.Range (0, 5);
 			running = true;
+		}
+
+		if (lado == 1) {
+			rangeVision = transform.position;
+			rangeVision.y += 5f;
+		} else if (lado == 2) {
+			rangeVision = transform.position;
+			rangeVision.y -= 5f;
+		} else if (lado == 3) {
+			rangeVision = transform.position;
+			rangeVision.x += 5f;
+		} else if (lado == 4) {
+			rangeVision = transform.position;
+			rangeVision.x -= 5f;
+		}
+
+		seePlayer = Physics2D.Linecast (transform.position, rangeVision, 1 << LayerMask.NameToLayer("Player"));
+
+		if (seePlayer) {
+			realVelocity = 3 * velocity;
+		} else {
+			realVelocity = velocity;
 		}
 
 		Move ();
@@ -58,17 +84,21 @@ public class enimie : MonoBehaviour
 			running = false;
 		}
 
-		if (running)  {
+		if (running || seePlayer)  {
 			if (lado == 1) {
-				transform.Translate (Vector2.up * velocity * Time.deltaTime);
+				anime.SetInteger("lado", lado);
+				transform.Translate (Vector2.up * realVelocity * Time.deltaTime);
 			} else if (lado == 2) {
-				transform.Translate (Vector2.up * -velocity * Time.deltaTime);
+				anime.SetInteger("lado", lado);
+				transform.Translate (Vector2.up * -realVelocity * Time.deltaTime);
 			} else if (lado == 3) {
+				anime.SetInteger("lado", lado);
 				transform.eulerAngles = new Vector2(0, 180);
-				transform.Translate (Vector2.right * -velocity * Time.deltaTime);
+				transform.Translate (Vector2.right * -realVelocity * Time.deltaTime);
 			} else if (lado == 4) {
+				anime.SetInteger("lado", lado);
 				transform.eulerAngles = new Vector2(0, 0);
-				transform.Translate (Vector2.right * -velocity * Time.deltaTime);
+				transform.Translate (Vector2.right * -realVelocity * Time.deltaTime);
 			}
 		}			
 	}
@@ -81,7 +111,7 @@ public class enimie : MonoBehaviour
 		} else if (colisor.gameObject.tag == "Power2") {
 			
 			life -= 5;
-		} else if (colisor.gameObject.tag == "Background") {
+		} else if (!seePlayer && colisor.gameObject.tag == "Background") {
 
 			lado -= 1;
 			if (lado < 1)

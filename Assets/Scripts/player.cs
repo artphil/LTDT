@@ -45,28 +45,33 @@ public class player : MonoBehaviour {
 		if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.DownArrow) 
 			|| Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow)) {
 			lado = 0;
+			anime.SetBool("anda", false);
 		}
 
 		// Verifica se seta direita e pressionada
 		if (lado == 0 && Input.GetKeyDown(KeyCode.UpArrow)){
 			lado = 1;
-			anime.SetInteger ("lado", lado);			
+			anime.SetInteger ("lado", lado);
+			anime.SetBool("anda", true);
 		}
 		// Verifica se seta baixo e pressionada
 		if (lado == 0 && Input.GetKeyDown(KeyCode.DownArrow)){
 			lado = 2;
 			anime.SetInteger ("lado", lado);
+			anime.SetBool("anda", true);
 		}
 		// Verifica se seta esquerda e pressionada
 		if (lado == 0 && Input.GetKeyDown(KeyCode.LeftArrow)){
 			lado = 3;
 			anime.SetInteger ("lado", lado);
+			anime.SetBool("anda", true);
 			transform.eulerAngles = new Vector2 (0, 0);
 		}
 		// Verifica se seta direita e pressionada
 		if (lado == 0 && Input.GetKeyDown(KeyCode.RightArrow)){
 				lado = 4;
 				anime.SetInteger ("lado", lado);
+				anime.SetBool("anda", true);
 				transform.eulerAngles = new Vector2 (0, 180);
 		}
 
@@ -76,25 +81,30 @@ public class player : MonoBehaviour {
 		} else if (lado == 2) {
 			transform.Translate (Vector2.up * -velocity * Time.deltaTime);
 		} else if (lado >= 3) {
-			transform.Translate (Vector2.right * -velocity * Time.deltaTime);
+			transform.Translate (Vector2.right * -velocity * Time.deltaTime); 
 		}
 	}
 
 	void Ataca () {
 
 		// Determina a posicão do ataque
-		danoposition = transform.position;
+		//danoposition = transform.position;
 
 		if (lado == 1) {
-			danoposition.y += 0.15f;
+			danoposition.x = transform.position.x;
+			danoposition.y = transform.position.y + 0.15f;
 		} else if (lado == 2) {
-			danoposition.y -= 0.15f;
+			danoposition.x = transform.position.x;
+			danoposition.y = transform.position.y - 0.15f;
 		} else if (lado == 3) {
-			danoposition.x -= 0.15f;
+			danoposition.x = transform.position.x - 0.15f;
+			danoposition.y = transform.position.y;
 		} else if (lado == 4) {
-			danoposition.x += 0.15f;
+			danoposition.x = transform.position.x + 0.15f;
+			danoposition.y = transform.position.y;
 		}
-			
+
+		// Ataca quando "Space" é pressionado	
 		if (Input.GetKeyDown(KeyCode.Space)) {
 			anime.SetTrigger ("ataque");
 			Instantiate(dano, danoposition, transform.rotation);
