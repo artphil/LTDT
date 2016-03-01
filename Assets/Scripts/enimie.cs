@@ -11,6 +11,7 @@ public class enimie : MonoBehaviour
     public float runDelay;              // Tempo que caminha prara cada direção
     private float runningTime;          // Tempo de caminhada
     private bool running;               // Indica se está andando
+	private bool vunerable;				// Indica que pode ser atacado
 	private bool seePlayer;             // Indica viu o jogador
 	private Vector2	rangeVision;		// Alcance da visao do mosntro
 	private int lado;					// Indica a direção a ser percorrida
@@ -18,7 +19,7 @@ public class enimie : MonoBehaviour
     //Animação
     public Transform character;          //Personagem jogavel
     private Animator anime;              //Animação do personagem
-
+	private SpriteRenderer color;
 	public int life;
 
     // Use this for initialization
@@ -26,6 +27,7 @@ public class enimie : MonoBehaviour
     {
         // Carrega a animação
         anime = character.GetComponent<Animator>();
+		color = character.GetComponent<SpriteRenderer>();
         runningTime = 0;
         running = false;
 		life = 10;
@@ -38,7 +40,7 @@ public class enimie : MonoBehaviour
     {
 		if (!running && !seePlayer) {
 			runDelay = Random.Range (1, 6);
-			lado = Random.Range (0, 5);
+			lado = Random.Range (1,4);
 			running = true;
 		}
 
@@ -59,9 +61,17 @@ public class enimie : MonoBehaviour
 		seePlayer = Physics2D.Linecast (transform.position, rangeVision, 1 << LayerMask.NameToLayer("Player"));
 
 		if (seePlayer) {
+			
 			realVelocity = 3 * velocity;
+			vunerable = true;
+			color.color = new Color(1f,1f,1f,1f);
+
 		} else {
+			
 			realVelocity = velocity;
+			vunerable = false;
+			color.color = new Color(1f,1f,1f,.3f);
+
 		}
 
 		Move ();
@@ -105,13 +115,20 @@ public class enimie : MonoBehaviour
 
 	void OnCollisionEnter2D (Collision2D colisor) {
 		
-		if (colisor.gameObject.tag == "p_ataque") {
-			
+		if (vunerable && colisor.gameObject.tag == "p_ataque") {
+
+			runDelay = 0.3f;
+			lado = 0;
 			life -= 1;
+			vunerable = false;
+
 		} else if (colisor.gameObject.tag == "Power2") {
 			
 			life -= 5;
-		} else if (!seePlayer && colisor.gameObject.tag == "Background") {
+		
+		} else if (!seePlayer && 
+						(colisor.gameObject.tag == "Background" ||
+							colisor.gameObject.tag == "Enimie")) {
 
 			lado -= 1;
 			if (lado < 1)
